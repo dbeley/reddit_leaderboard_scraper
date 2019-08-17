@@ -15,7 +15,7 @@ logger = logging.getLogger()
 TEMPS_DEBUT = time.time()
 AUJ = datetime.datetime.now().strftime("%Y-%m-%d")
 
-# categories to NOT extract
+# Categories to NOT extract
 BLACKLISTED_CATEGORIES = [
     # "all communities",
     # "sports",
@@ -28,26 +28,26 @@ BLACKLISTED_CATEGORIES = [
     # "travel",
     # "tech",
     # "music",
-    "art & design",
-    "beauty",
-    "books & writing",
-    "crypto",
-    "discussion",
-    "fashion",
-    "finance & business",
-    "food",
-    "health & fitness",
-    "learning",
-    "mindblowing",
-    "outdoors",
-    "parenting",
-    "photography",
-    "relationships",
-    "science",
-    "video games",
-    "videos",
-    "vroom",
-    "wholesome",
+    # "art & design",
+    # "beauty",
+    # "books & writing",
+    # "crypto",
+    # "discussion",
+    # "fashion",
+    # "finance & business",
+    # "food",
+    # "health & fitness",
+    # "learning",
+    # "mindblowing",
+    # "outdoors",
+    # "parenting",
+    # "photography",
+    # "relationships",
+    # "science",
+    # "video games",
+    # "videos",
+    # "vroom",
+    # "wholesome",
 ]
 
 
@@ -56,7 +56,7 @@ def get_soup(browser):
 
 
 def get_empty_dict(soup):
-    # list categories
+    # List categories contained in soup object
     list_dict_cat = [
         {
             "category": cat.text,
@@ -78,7 +78,16 @@ def main():
     url = "https://www.reddit.com/subreddits/leaderboard/"
     browser.get(url)
 
-    # click on show more to display all categories
+    Path("Exports").mkdir(parents=True, exist_ok=True)
+
+    try:
+        with open("Exports/subreddits_list.txt", "r") as f:
+            subreddits = [x.strip() for x in f.readlines()]
+    except Exception as e:
+        logger.warning("File subreddits_list.txt not found : %s.", e)
+        subreddits = []
+
+    # Click on show more to display all categories
     try:
         browser.find_element_by_class_name("_1McO-Omm_mC2bkTnVgD6NV").click()
         logger.debug('Clicked on "Show More" button.')
@@ -89,12 +98,12 @@ def main():
 
     list_dict_cat = get_empty_dict(soup)
 
-    # results for each category (max 25)
+    # Results for each category (max 25)
     for cat in list_dict_cat:
         browser.get(cat["url"])
 
-        # uncomment to have more than 25 subreddits
-        # scroll to bottom of page
+        # Uncomment to have more than 25 subreddits
+        # Scroll to bottom of page
         # browser.execute_script(
         #     "window.scrollTo(0, document.body.scrollHeight);"
         # )
@@ -110,14 +119,30 @@ def main():
             )
             cat["subreddits"].append(li.find("a")["href"])
 
-    # creating json object for the day
+    # Creating json object for the day
     day_result = {"day": AUJ, "leaderboard": list_dict_cat}
 
-    Path("Exports").mkdir(parents=True, exist_ok=True)
-    # exporting json
+    # Exporting json for the day
     with open(f"Exports/results_{AUJ}.json", "w") as f:
         json.dump(day_result, f, indent=4)
 
+    # Complete subreddit list
+    # Changing format to keep just the lowercase subreddit name
+    subreddits = subreddits + [
+        y.lower()[3:-1] for x in list_dict_cat for y in x["subreddits"]
+    ]
+    orig_length = len(subreddits)
+    subreddits = list(set(subreddits))
+    logger.info(
+        f"Complete subreddit list : {orig_length - len(subreddits)} duplicates subreddits found. Deleting."
+    )
+    with open("Exports/subreddits_list.txt", "w") as f:
+        for i in subreddits:
+            f.write(f"{i}\n")
+
+    logger.debug("Closing Selenium Browser.")
+    browser.close()
+    browser.quit()
     logger.info("Runtime : %.2f seconds." % (time.time() - TEMPS_DEBUT))
 
 
