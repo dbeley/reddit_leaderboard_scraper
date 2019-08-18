@@ -1,0 +1,10 @@
+[Unit]
+Description=reddit_leaderboard_scraper.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Documents/reddit_leaderboard_scraper/
+ExecStart=%h/Documents/reddit_leaderboard_scraper/.venv/bin/reddit_leaderboard_scraper
+
+[Install]
+WantedBy=multi-user.target

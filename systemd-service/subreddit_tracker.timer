@@ -1,0 +1,9 @@
+[Unit]
+Description=Run the reddit_leaderboard_scraper script every day.
+
+[Timer]
+OnCalendar=*-*-* 08:00:00
+Persistent = True
+
+[Install]
+WantedBy=timers.target
