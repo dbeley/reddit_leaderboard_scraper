@@ -100,14 +100,18 @@ def main():
 
     # Results for each category (max 25)
     for cat in list_dict_cat:
+        logger.info(
+            "Retrieving top communities in category %s.", cat["category"]
+        )
         browser.get(cat["url"])
 
+        time.sleep(2)
         # Uncomment to have more than 25 subreddits
         # Scroll to bottom of page
-        # browser.execute_script(
-        #     "window.scrollTo(0, document.body.scrollHeight);"
-        # )
-        # time.sleep(2)
+        browser.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        time.sleep(2)
 
         soup = get_soup(browser)
 
@@ -118,6 +122,7 @@ def main():
                 "%s - %s : %s", cat["category"], index, li.find("a")["href"]
             )
             cat["subreddits"].append(li.find("a")["href"])
+        logger.info("%s communities found.", len(cat["subreddits"]))
 
     # Creating json object for the day
     day_result = {"day": AUJ, "leaderboard": list_dict_cat}

@@ -3,3 +3,4 @@ Exports/
 *.log
 *.egg-info/
 tags
+__pycache__/
