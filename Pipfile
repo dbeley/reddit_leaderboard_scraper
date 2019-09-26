@@ -6,8 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-reddit-leaderboard-scraper = {editable = true,path = "."}
 e1839a8 = {editable = true,path = "."}
+reddit-leaderboard-scraper = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
